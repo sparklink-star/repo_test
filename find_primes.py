@@ -12,6 +12,11 @@ def find_primes(start, end):
     primes = [num for num in range(start, end + 1) if is_prime(num)]
     return primes
     
+def find_primes_s2(start, end):
+   """Find all prime numbers in a given range."""
+    primes = [num for num in range(start, end + 1) if is_prime(num)]
+    return primes
+
 def find_primes1(start, end):
     """Find all prime numbers in a given range."""
     primes = [num for num in range(start, end + 1) if is_prime(num)]
