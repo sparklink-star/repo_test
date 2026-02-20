@@ -31,3 +31,14 @@ jobs:
         run: |
           echo Add other actions to build,
           echo test, and deploy your project.
+
+      - name: print old env var
+        env:
+            SF_ENV: ${{vars.SF_ENV}}
+        run: echo "$SF_ENV"
+      - name: uppercase env var
+        env:
+            SF_ENV: ${{vars.SF_ENV}}
+        run: echo "U_ENV=$(echo ${SF_ENV^^})" >> $GITHUB_ENV
+      - name: print new var
+        run: echo "$U_ENV"    
