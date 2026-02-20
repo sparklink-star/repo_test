@@ -1,0 +1,39 @@
+name: Snowflake Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # This allows you to run it manually for testing
+
+jobs:
+  schemachange-job:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Uppercase Environment Variable
+        run: |
+          # Taking the variable from GitHub Vars and converting to uppercase
+          RAW_ENV="${{ vars.SF_ENV }}"
+          echo "U_ENV=${RAW_ENV^^}" >> $GITHUB_ENV
+
+      - name: Run Schemachange in Docker
+        run: |
+          cat <<EOF
+          DEBUG: The command that would have run is:
+          
+          docker run --rm \
+            -v ${{ github.workspace }}:/usr/src/schemachange \
+            -e U_ENV=${{ env.U_ENV }} \
+            python:3.12 /bin/bash -c "
+              pip install schemachange==4.3.2 numpy==1.26.4 --upgrade && \
+              pip install --force-reinstall https://github.com/dfff/rfff/abc.zip && \
+              schemachange deploy \
+                --config-folder /usr/src/schemachange/ddl \
+                -f /usr/src/schemachange/ddl \
+                -e SF_ENV=${{ env.U_ENV }} \
+                -c METADATA.SCHEMACHANGE.${{ env.U_ENV }}_CHANGE_HISTORY
+            "
+          EOF
