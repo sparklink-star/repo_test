@@ -41,4 +41,19 @@ jobs:
             SF_ENV: ${{vars.SF_ENV}}
         run: echo "U_ENV=$(echo ${SF_ENV^^})" >> $GITHUB_ENV
       - name: print new var
-        run: echo "$U_ENV"    
+        run: echo "$U_ENV"
+
+      - name: Debug full docker command
+        run: |
+          CMD="docker run --rm \
+            --name schemachange-script \
+            python:3.12 \
+            /bin/bash -c \"pip install schemachange==4.3.2 numpy==1.26.4 --upgrade && \
+            pip install --force-reinstall https://github.com/dfff/rfff/abc.zip && \
+            schemachange deploy \
+              --config-folder /usr/src/schemachange/ddl \
+              -f /usr/src/schemachange/ddl \
+              -e SF_ENV=$U_ENV \
+              -c METADATA.SCHEMACHANGE.${U_ENV}_CHANGE_HISTORY\""
+      
+          echo "$CMD"
